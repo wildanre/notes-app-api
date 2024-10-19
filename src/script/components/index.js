@@ -1,4 +1,4 @@
-import './app-bar.js'; 
+import './app-bar.js';
 import './notes-section.js';
 import './archive-section.js';
 import './loading-indicator.js';

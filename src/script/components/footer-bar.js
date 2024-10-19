@@ -1,16 +1,15 @@
 class FooterBar extends HTMLElement {
-    constructor() {
-      super();
-    }
-  
-    connectedCallback() {
-      this.innerHTML = `
-        <footer class="footer-bar">
-          <p>&copy; 2024 My Notes App</p>
-        </footer>
-      `;
-    }
+  constructor() {
+    super();
   }
-  
-  customElements.define('footer-bar', FooterBar);
-  
+
+  connectedCallback() {
+    this.innerHTML = `
+        <div class="footer-bar">
+          <p>&copy; 2024 My Notes App</p>
+        </div>
+      `;
+  }
+}
+
+customElements.define('footer-bar', FooterBar);

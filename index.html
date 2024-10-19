@@ -1,53 +1,50 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Notes App</title>
-    <link rel="stylesheet" href="./src/style/style.css">
-</head>
+    <!-- <link rel="stylesheet" href="./src/style/style.css" /> -->
+  </head>
 
-<body>
+  <body>
     <header>
-        <app-bar></app-bar>
+      <app-bar></app-bar>
     </header>
 
-
     <main>
-        <div>
-            <section class="form-section">
-                <form id="note-form">
-                    <span class="error-message"></span>
-                    <input type="text" id="note-title" placeholder="Masukkan Judul" required>
-                    <textarea id="note-body" placeholder="Ketikkan Catatan" required></textarea>
-                    <span class="error-message"></span>
-                    <button type="submit" class="add-note-btn">Simpan</button>
-                </form>
-            </section>
+      <div>
+        <section class="form-section">
+          <form id="note-form">
+            <span class="error-message"></span>
+            <input type="text" id="note-title" placeholder="Masukkan Judul" required />
+            <textarea id="note-body" placeholder="Ketikkan Catatan" required></textarea>
+            <span class="error-message"></span>
+            <button type="submit" class="add-note-btn">Simpan</button>
+          </form>
+        </section>
 
-            <section>
-                <div id="loading-indicator" class="loading hidden">
-                    <p>Loading...</p>
-                </div>
-                <notes-section></notes-section>
-            </section>
+        <section>
+          <div id="loading-indicator" class="loading hidden">
+            <p>Loading...</p>
+          </div>
+          <notes-section></notes-section>
+        </section>
 
-            <section>
-                <div id="loading-indicator" class="loading hidden">
-                    <p>Loading...</p>
-                </div>
-                <archive-section></archive-section>
-            </section>
-        </div>
+        <section>
+          <div id="loading-indicator" class="loading hidden">
+            <p>Loading...</p>
+          </div>
+          <archive-section></archive-section>
+        </section>
+      </div>
     </main>
     <footer>
-        <footer-bar></footer-bar>
+      <footer-bar></footer-bar>
     </footer>
 
-    <script type="module" src="./script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
 </body>
-
+<script type="module" src="./script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
 </html>

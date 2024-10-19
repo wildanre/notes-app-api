@@ -4,13 +4,16 @@
   box-sizing: border-box;
 }
 body {
-  font-family: "Open Sans", sans-serif;
-  margin: 0;
-  padding: 0;
+  font-family: 'Open Sans', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
   background-color: #fff9e6;
   color: #2c2c2c;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 .app-bar {
@@ -45,7 +48,6 @@ body.dark-mode {
   color: #fff;
 }
 
-
 #dark-mode-toggle {
   background-color: #ffffff;
   border: 1px solid #2c2c2c;
@@ -57,8 +59,8 @@ body.dark-mode {
 }
 
 main {
+  flex: 1;
   margin: 2rem;
-  display: grid;
 }
 
 .form-section {
@@ -80,8 +82,10 @@ textarea {
   border: 1px solid #2c2c2c;
   border-radius: 12px;
   background-color: #fff;
-  color: #2c2c2c;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  color: #1a1a1a;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 input:focus,
@@ -100,6 +104,7 @@ button.add-note-btn {
   border: none;
   padding: 0.75rem;
   font-size: 1rem;
+  margin-bottom: 1rem;
   color: white;
   cursor: pointer;
   border-radius: 12px;
@@ -132,6 +137,8 @@ button.add-note-btn:hover {
   height: 250px;
   width: 100%;
   padding: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
   background-color: #fff;
   border: 1px solid #2c2c2c;
   border-radius: 16px;
@@ -178,8 +185,6 @@ button.archive-btn:hover {
   font-weight: 600;
   text-align: center;
   padding: 2rem;
-  position: relative;
-  bottom: 0;
   width: 100%;
 }
 
@@ -208,7 +213,7 @@ button#dark-mode-toggle.dark-mode {
 form.dark-mode input,
 form.dark-mode textarea {
   background-color: #e5e5e5;
-  color: white;
+  color: #1d1d1d;
   border: 1px solid #888;
 }
 

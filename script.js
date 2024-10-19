@@ -1,4 +1,5 @@
 import './src/script/components/index.js';
+import './src/style/style.css';
 import NotesApi from './src/data/remote/data-api.js';
 
 class NoteItem extends HTMLElement {
@@ -22,15 +23,19 @@ class NoteItem extends HTMLElement {
             <p class="note-body">${this.note.body}</p>
             ${this.note.archived ? '' : `<button class="archive-btn" data-id="${this.note.id}">Arsipkan</button>`}
         </div>
-        `;
+    `;
 
         this.querySelector('.delete-btn').addEventListener('click', () => {
             deleteNoteAPI(this.note.id);
         });
 
-        this.querySelector('.archive-btn').addEventListener('click', () => {
-            archiveNoteAPI(this.note.id);
-        });
+        // Tambahkan pengecekan untuk tombol arsip
+        const archiveButton = this.querySelector('.archive-btn');
+        if (archiveButton) {
+            archiveButton.addEventListener('click', () => {
+                archiveNoteAPI(this.note.id);
+            });
+        }
     }
 
 }
@@ -49,13 +54,12 @@ async function fetchNotes() {
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
-            text: 'Gagal memuat catatan. Silakan coba lagi nanti.'
+            text: 'Gagal memuat catatan. Silakan coba lagi nanti.',
         });
     } finally {
         hideLoading();
     }
 }
-
 
 // Render catatan
 function renderNotes(notesData) {
@@ -65,7 +69,7 @@ function renderNotes(notesData) {
     notesGrid.innerHTML = '';
     archiveGrid.innerHTML = '';
 
-    notesData.forEach(note => {
+    notesData.forEach((note) => {
         const noteItem = document.createElement('note-item');
         noteItem.setAttribute('note-data', JSON.stringify(note));
         noteItem.setAttribute('data-id', note.id);
@@ -94,7 +98,7 @@ async function addNote() {
     if (validateInput(title) && validateInput(body)) {
         const newNote = {
             title: title.value,
-            body: body.value
+            body: body.value,
         };
 
         try {
@@ -106,7 +110,7 @@ async function addNote() {
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                text: 'Gagal menambah catatan. Silakan coba lagi nanti.'
+                text: 'Gagal menambah catatan. Silakan coba lagi nanti.',
             });
         } finally {
             hideLoading();
@@ -120,15 +124,15 @@ async function addNote() {
 // Validasi input
 function validateInput(input) {
     const value = input.value.trim();
-    const errorElement = input.nextElementSibling;  // Ambil elemen error di bawah input
+    const errorElement = input.nextElementSibling; // Ambil elemen error di bawah input
 
-    if (value === "") {
-        errorElement.textContent = "Field ini tidak boleh kosong!";
-        input.classList.add("invalid");
+    if (value === '') {
+        errorElement.textContent = 'Field ini tidak boleh kosong!';
+        input.classList.add('invalid');
         return false;
     } else {
-        errorElement.textContent = "";
-        input.classList.remove("invalid");
+        errorElement.textContent = '';
+        input.classList.remove('invalid');
         return true;
     }
 }
@@ -143,7 +147,7 @@ async function deleteNoteAPI(id) {
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
         confirmButtonText: 'Hapus',
-        cancelButtonText: 'Batal'
+        cancelButtonText: 'Batal',
     });
 
     if (result.isConfirmed) {
@@ -158,25 +162,20 @@ async function deleteNoteAPI(id) {
                     showLoading();
                     await NotesApi.deleteNote(id);
                     fetchNotes();
-                    Swal.fire(
-                        'Terhapus!',
-                        'Catatan telah dihapus.',
-                        'success'
-                    );
+                    Swal.fire('Terhapus!', 'Catatan telah dihapus.', 'success');
                     hideLoading();
-                }
+                },
             });
         } catch (error) {
             console.error(error);
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                text: 'Gagal menghapus catatan. Silakan coba lagi nanti.'
+                text: 'Gagal menghapus catatan. Silakan coba lagi nanti.',
             });
         }
     }
 }
-
 
 // Mengarsipkan catatan
 async function archiveNoteAPI(id) {
@@ -203,7 +202,7 @@ async function archiveNoteAPI(id) {
 
                     // Animasi muncul saat catatan berada di archiveGrid
                     gsap.from(noteItem, { opacity: 0, y: 20, duration: 0.5 });
-                }
+                },
             });
         }
     } catch (error) {
@@ -211,20 +210,17 @@ async function archiveNoteAPI(id) {
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
-            text: 'Gagal mengarsipkan catatan. Silakan coba lagi nanti.'
+            text: 'Gagal mengarsipkan catatan. Silakan coba lagi nanti.',
         });
     } finally {
         hideLoading();
     }
 }
 
-
 // Mengambil catatan aktif dan diarsipkan
 async function fetchData() {
     await Promise.all([fetchNotes(), fetchArchivedNotes()]); // Ambil kedua data secara bersamaan
 }
-
-
 
 // Load notes on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -242,24 +238,22 @@ async function fetchArchivedNotes() {
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
-            text: 'Gagal memuat catatan diarsipkan. Silakan coba lagi nanti.'
+            text: 'Gagal memuat catatan diarsipkan. Silakan coba lagi nanti.',
         });
     } finally {
         hideLoading();
     }
 }
 
-
 function renderArchivedNotes(notesData) {
     const archiveGrid = document.getElementById('archive-grid');
 
-    notesData.forEach(note => {
+    notesData.forEach((note) => {
         const noteItem = document.createElement('note-item');
         noteItem.setAttribute('note-data', JSON.stringify(note));
         archiveGrid.appendChild(noteItem);
     });
 }
-
 
 // Event listener untuk form
 document.getElementById('note-form').addEventListener('submit', (e) => {
@@ -272,6 +266,6 @@ const darkModeToggle = document.getElementById('dark-mode-toggle');
 darkModeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     document.querySelector('form').classList.toggle('dark-mode');
-    document.querySelectorAll('.notes-grid').forEach(grid => grid.classList.toggle('dark-mode'));
+    document.querySelectorAll('.notes-grid').forEach((grid) => grid.classList.toggle('dark-mode'));
     darkModeToggle.classList.toggle('dark-mode');
 });
