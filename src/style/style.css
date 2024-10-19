@@ -24,6 +24,27 @@ body {
   justify-items: start;
   gap: 1rem;
 }
+/* Styling for loading indicator */
+.hidden {
+  display: none;
+}
+
+.loading {
+  text-align: center;
+  margin: 20px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+body.dark-mode {
+  background-color: #333;
+  color: #fff;
+}
+
+.dark-mode .loading {
+  color: #fff;
+}
+
 
 #dark-mode-toggle {
   background-color: #ffffff;
