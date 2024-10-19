@@ -19,26 +19,24 @@
             <section class="form-section">
                 <form id="note-form">
                     <span class="error-message"></span>
-                    <input type="text" id="note-title" placeholder="Note Title" required>
-                    <textarea id="note-body" placeholder="Note Body" required></textarea>
+                    <input type="text" id="note-title" placeholder="Masukkan Judul" required>
+                    <textarea id="note-body" placeholder="Ketikkan Catatan" required></textarea>
                     <span class="error-message"></span>
-                    <button type="submit" class="add-note-btn">Save Note</button>
+                    <button type="submit" class="add-note-btn">Simpan</button>
                 </form>
             </section>
 
             <section>
+                <div id="loading-indicator" class="loading hidden">
+                    <p>Loading...</p>
+                </div>
                 <notes-section></notes-section>
             </section>
+
             <section>
                 <div id="loading-indicator" class="loading hidden">
                     <p>Loading...</p>
                 </div>
-            </section>
-            <!-- <section>
-                <h2>Archived Notes</h2>
-                <div id="archive-grid" class="notes-grid"></div>
-            </section> -->
-            <section>
                 <archive-section></archive-section>
             </section>
         </div>
@@ -48,6 +46,8 @@
     </footer>
 
     <script type="module" src="./script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
 </body>
 
 </html>

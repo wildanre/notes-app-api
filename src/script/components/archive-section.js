@@ -1,7 +1,7 @@
 class ArchiveSection extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
-            <h2>Archived Notes</h2>
+            <h2>Catatan Diarsipkan</h2>
             <div id="archive-grid" class="notes-grid"></div>
         `;
     }

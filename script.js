@@ -14,16 +14,14 @@ class NoteItem extends HTMLElement {
 
     render() {
         this.innerHTML = `
-            <div class="note-item">
-                <div class="note-header">
-                    <h3>${this.note.title}</h3>
-                    <button class="delete-btn" data-id="${this.note.id}">Delete</button>
-                </div>
-                <p class="note-body">${this.note.body}</p>
-                <button class="archive-btn" data-id="${this.note.id}">
-                    ${this.note.archived ? 'Unarchive' : 'Archive'}
-                </button>
+        <div class="note-item">
+            <div class="note-header">
+                <h3>${this.note.title}</h3>
+                <button class="delete-btn" data-id="${this.note.id}">Hapus</button>
             </div>
+            <p class="note-body">${this.note.body}</p>
+            ${this.note.archived ? '' : `<button class="archive-btn" data-id="${this.note.id}">Arsipkan</button>`}
+        </div>
         `;
 
         this.querySelector('.delete-btn').addEventListener('click', () => {
@@ -31,40 +29,52 @@ class NoteItem extends HTMLElement {
         });
 
         this.querySelector('.archive-btn').addEventListener('click', () => {
-            toggleArchiveAPI(this.note.id, this.note.archived);
+            archiveNoteAPI(this.note.id);
         });
     }
+
 }
 customElements.define('note-item', NoteItem);
 
+document.addEventListener('DOMContentLoaded', async () => {
+    await fetchData(); // Ambil data catatan
+});
 async function fetchNotes() {
-    showLoading();  // Tampilkan loading indicator
+    showLoading();
     try {
         const response = await NotesApi.getNotes();
         renderNotes(response.data);
     } catch (error) {
         console.error(error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Gagal memuat catatan. Silakan coba lagi nanti.'
+        });
     } finally {
-        hideLoading();  // Sembunyikan loading indicator
+        hideLoading();
     }
 }
 
+
+// Render catatan
 function renderNotes(notesData) {
     const notesGrid = document.getElementById('notes-grid');
     const archiveGrid = document.getElementById('archive-grid');
 
-    notesGrid.innerHTML = '';  // Clear active notes grid
-    archiveGrid.innerHTML = ''; // Clear archive notes grid
+    notesGrid.innerHTML = '';
+    archiveGrid.innerHTML = '';
 
     notesData.forEach(note => {
         const noteItem = document.createElement('note-item');
         noteItem.setAttribute('note-data', JSON.stringify(note));
-
+        noteItem.setAttribute('data-id', note.id);
         if (!note.archived) {
-            notesGrid.appendChild(noteItem);  // Add to active notes grid
+            notesGrid.appendChild(noteItem);
         } else {
-            archiveGrid.appendChild(noteItem);  // Add to archive grid
+            archiveGrid.appendChild(noteItem);
         }
+        gsap.from(noteItem, { opacity: 0, y: -20, duration: 0.5 });
     });
 }
 
@@ -89,15 +99,19 @@ async function addNote() {
 
         try {
             showLoading();
-            await NotesApi.addNote(newNote);  // Tambah catatan via API
-            fetchNotes();  // Refresh catatan setelah berhasil ditambah
+            await NotesApi.addNote(newNote);
+            fetchNotes();
         } catch (error) {
             console.error(error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Gagal menambah catatan. Silakan coba lagi nanti.'
+            });
         } finally {
             hideLoading();
         }
 
-        // Reset form fields tanpa memengaruhi tombol
         title.value = '';
         body.value = '';
     }
@@ -121,33 +135,102 @@ function validateInput(input) {
 
 // Menghapus catatan
 async function deleteNoteAPI(id) {
+    const result = await Swal.fire({
+        title: 'Anda yakin?',
+        text: 'Catatan ini akan dihapus!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Hapus',
+        cancelButtonText: 'Batal'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const noteItem = document.querySelector(`note-item[data-id="${id}"]`);
+            // Animasi saat catatan dihapus
+            gsap.to(noteItem, {
+                opacity: 0,
+                y: -20,
+                duration: 0.5,
+                onComplete: async () => {
+                    showLoading();
+                    await NotesApi.deleteNote(id);
+                    fetchNotes();
+                    Swal.fire(
+                        'Terhapus!',
+                        'Catatan telah dihapus.',
+                        'success'
+                    );
+                    hideLoading();
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Gagal menghapus catatan. Silakan coba lagi nanti.'
+            });
+        }
+    }
+}
+
+
+// Mengarsipkan catatan
+async function archiveNoteAPI(id) {
     try {
         showLoading();
-        await NotesApi.deleteNote(id);
-        fetchNotes();
+        await NotesApi.toggleArchive(id, true);
+
+        // Memindahkan catatan dari notesGrid ke archiveGrid
+        const noteItem = document.querySelector(`note-item[data-id="${id}"]`);
+        if (noteItem) {
+            // Animasi memudarkan catatan
+            gsap.to(noteItem, {
+                opacity: 0,
+                y: -20,
+                duration: 0.5,
+                onComplete: async () => {
+                    const archiveGrid = document.getElementById('archive-grid');
+                    archiveGrid.appendChild(noteItem); // Pindahkan catatan ke archiveGrid
+                    noteItem.querySelector('.archive-btn').remove(); // Hapus tombol arsip setelah dipindahkan
+
+                    // Ambil data terbaru setelah mengarsipkan
+                    await fetchNotes(); // Memperbarui catatan aktif
+                    await fetchArchivedNotes(); // Memperbarui catatan diarsipkan
+
+                    // Animasi muncul saat catatan berada di archiveGrid
+                    gsap.from(noteItem, { opacity: 0, y: 20, duration: 0.5 });
+                }
+            });
+        }
     } catch (error) {
         console.error(error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Gagal mengarsipkan catatan. Silakan coba lagi nanti.'
+        });
     } finally {
         hideLoading();
     }
 }
 
-// Toggle archive
-async function toggleArchiveAPI(id, isArchived) {
-    try {
-        showLoading();
-        if (isArchived) {
-            await NotesApi.toggleArchive(id, false); // Menggunakan false untuk unarchive
-        } else {
-            await NotesApi.toggleArchive(id, true); // Menggunakan true untuk archive
-        }
-        fetchNotes();
-    } catch (error) {
-        console.error(error);
-    } finally {
-        hideLoading();
-    }
+
+// Mengambil catatan aktif dan diarsipkan
+async function fetchData() {
+    await Promise.all([fetchNotes(), fetchArchivedNotes()]); // Ambil kedua data secara bersamaan
 }
+
+
+
+// Load notes on page load
+document.addEventListener('DOMContentLoaded', () => {
+    fetchNotes(); // Catatan aktif
+    fetchArchivedNotes(); // Catatan diarsipkan
+});
 
 async function fetchArchivedNotes() {
     showLoading();
@@ -156,17 +239,27 @@ async function fetchArchivedNotes() {
         renderArchivedNotes(response.data);
     } catch (error) {
         console.error(error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Gagal memuat catatan diarsipkan. Silakan coba lagi nanti.'
+        });
     } finally {
         hideLoading();
     }
 }
 
+
 function renderArchivedNotes(notesData) {
-    const archiveSection = document.querySelector('archive-section');
-    if (archiveSection) {
-        archiveSection.notes = notesData;  // Menggunakan properti setter dari custom element ArchiveSection
-    }
+    const archiveGrid = document.getElementById('archive-grid');
+
+    notesData.forEach(note => {
+        const noteItem = document.createElement('note-item');
+        noteItem.setAttribute('note-data', JSON.stringify(note));
+        archiveGrid.appendChild(noteItem);
+    });
 }
+
 
 // Event listener untuk form
 document.getElementById('note-form').addEventListener('submit', (e) => {
@@ -181,10 +274,4 @@ darkModeToggle.addEventListener('click', () => {
     document.querySelector('form').classList.toggle('dark-mode');
     document.querySelectorAll('.notes-grid').forEach(grid => grid.classList.toggle('dark-mode'));
     darkModeToggle.classList.toggle('dark-mode');
-});
-
-// Load notes on page load
-document.addEventListener('DOMContentLoaded', () => {
-    fetchNotes();
-    fetchArchivedNotes(); // Memuat catatan diarsipkan
 });

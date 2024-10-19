@@ -1,5 +1,6 @@
 const BASE_URL = 'https://notes-api.dicoding.dev/v2';
 
+
 class NotesApi {
   static async getNotes() {
     const response = await fetch(`${BASE_URL}/notes`);
@@ -42,6 +43,7 @@ class NotesApi {
     return response.json();
   }
 
+
   static async toggleArchive(id, isArchived) {
     const method = isArchived ? 'POST' : 'DELETE'; // Gunakan POST untuk archive dan DELETE untuk unarchive
     const response = await fetch(`${BASE_URL}/notes/${id}/${isArchived ? 'archive' : 'unarchive'}`, {
@@ -56,6 +58,7 @@ class NotesApi {
     }
     return response.json();
   }
+  
 
 }
 
